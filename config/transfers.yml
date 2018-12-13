@@ -1,0 +1,3 @@
+nodes:
+  - port: 5500
+    target: '0x53A9462Be18D8f74C1065Be65A58D5A41347e0A6'
