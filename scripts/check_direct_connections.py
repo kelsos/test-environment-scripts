@@ -4,6 +4,8 @@ import time
 import click
 import requests
 
+from raiden_api.api import Api
+
 
 def direct_partners(port: int, token_address: str):
     url = f'http://localhost:{port}/api/1/channels'
@@ -37,15 +39,6 @@ def transfer(port: int, token: str, partner_address: str):
     )
 
 
-def address(port: int) -> str:
-    url = f'http://localhost:{port}/api/1/address'
-    return requests.get(
-        url,
-        headers={'Content-Type': 'application/json', },
-        timeout=20
-    ).json()['our_address']
-
-
 @click.command()
 @click.option('--token', required=True, type=str)
 @click.option('--start-port', required=True, type=int)
@@ -54,7 +47,10 @@ def main(token: str, start_port: int, end_port: int):
     for port in range(start_port, end_port):
         partners = direct_partners(port, token)
 
-        our_address = address(port)
+        api = Api(port)
+
+        address_response = api.address()
+        our_address = address_response.our_address
 
         for partner_address in partners:
 
@@ -64,7 +60,7 @@ def main(token: str, start_port: int, end_port: int):
                     print(f'{our_address} to {partner_address} [v]')
                 else:
                     print(f'{our_address} to {partner_address} [x]')
-            except:
+            except requests.exceptions.RequestException:
                 print(f'{our_address} to {partner_address} [x]')
                 pass
 
