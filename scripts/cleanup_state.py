@@ -32,7 +32,12 @@ def main(chain_id: int, archive_directory: os.path, delete: bool):
 
     for directory in all_directories:
         print(f'compressing directory {directory}')
-        tar_file.add(directory)
+        if 'logs' in directory:
+            logs_archive_path = os.path.join('logs', directory.split('logs/')[1])
+            tar_file.add(directory, logs_archive_path)
+        elif '.raiden' in directory:
+            dbs_archive_path = os.path.join('dbs', directory.split('.raiden/')[1])
+            tar_file.add(directory, dbs_archive_path)
 
     tar_file.close()
 
