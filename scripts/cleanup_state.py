@@ -13,9 +13,9 @@ from shutil import rmtree
 
 @click.command()
 @click.option("--chain-id", required=True, type=int)
-@click.option("--log-directory", required=True, type=click.Path(exists=True, dir_okay=True, file_okay=False))
+@click.option("--archive-directory", required=True, type=click.Path(exists=True, dir_okay=True, file_okay=False))
 @click.option("--delete", type=bool, default=False)
-def main(chain_id: int, log_directory: os.path, delete: bool):
+def main(chain_id: int, archive_directory: os.path, delete: bool):
     accounts = get_accounts()
     raiden_dir = get_raiden_dir()
 
@@ -27,7 +27,7 @@ def main(chain_id: int, log_directory: os.path, delete: bool):
         print('No state to cleanup')
         exit(0)
 
-    tar_file = tarfile.open(tar_name(log_directory, chain_id), 'w:xz')
+    tar_file = tarfile.open(tar_name(archive_directory, chain_id), 'w:xz')
     print(f'preparing archive {tar_file.name}')
 
     for directory in all_directories:
@@ -70,11 +70,10 @@ def tar_name(log_directory: os.path, chain_id: int) -> os.path:
 
 
 def logs(accounts: List[str], chain_id: int) -> List[str]:
-    home = Path.home()
-    development = os.path.join(str(home), 'development')
-    raiden = os.path.join(development, 'raiden')
-    kovan = os.path.join(raiden, f'{chain_id}')
-    production = os.path.join(kovan, 'production')
+    parent_directory = os.path.abspath(os.path.join(os.path.join(__file__, os.pardir), os.pardir))
+    logs_directory = os.path.join(parent_directory, 'logs')
+    chain_directory = os.path.join(logs_directory, f'{chain_id}')
+    production = os.path.join(chain_directory, 'production')
 
     log_directories = os.listdir(production)
 
