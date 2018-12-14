@@ -1,26 +1,19 @@
 #!/usr/bin/env python
+import signal
+import threading
 import time
 
 import click
-import requests
-import signal
-import threading
 import tqdm
 import yaml
+
+from raiden_api.api import Api
+from raiden_api.model.exceptions import HttpErrorException
+from raiden_api.model.requests import PaymentRequest
 
 
 class ServiceExit(Exception):
     pass
-
-
-def payment(port: int, receiver: str, amount: int, identifier: int, token: str, timeout: int):
-    url = f'http://localhost:{port}/api/1/payments/{token}/{receiver}'
-    return requests.post(
-        url,
-        headers={'Content-Type': 'application/json', },
-        json={'amount': amount, 'identifier': identifier},
-        timeout=timeout
-    )
 
 
 class TransferJob(threading.Thread):
@@ -50,14 +43,13 @@ class TransferJob(threading.Thread):
         threading.Thread.__init__(self)
         self.terminate = threading.Event()
         self.__sender = sender
-        self.__port = port
         self.__receiver = receiver
         self.__position = position
         self.__total = total
         self.__single = single
         self.__errors_allowed = errors_allowed
         self.__token = token
-        self.__timeout = timeout
+        self.__api = Api(port, timeout)
 
     def transfer(self):
 
@@ -80,21 +72,17 @@ class TransferJob(threading.Thread):
             try:
                 start_time = time.time()
                 identifier = int(start_time)
-                resp = payment(
-                    port=self.__port,
-                    receiver=self.__receiver,
+
+                payment_request = PaymentRequest(
                     amount=self.__single,
                     identifier=identifier,
-                    token=self.__token,
-                    timeout=self.__timeout
                 )
+
+                payment_response = self.__api.payment(self.__receiver, payment_request, self.__token)
+
                 duration = time.time() - start_time
+                response_identifier = payment_response.identifier
 
-                if resp.status_code != 200:
-                    print(f'Invalid response error for {secs} sec [{errors}]')
-                    raise Exception(resp.json()['errors'])
-
-                response_identifier = resp.json()['identifier']
                 if response_identifier != identifier:
                     message = f'Identifier mismatch expected {identifier} got {response_identifier}'
                     print(message)
@@ -109,6 +97,9 @@ class TransferJob(threading.Thread):
                 print(f'transfer from {self.__sender} failed, waiting for {secs} sec [{errors}] -> {e}')
                 time.sleep(secs)
                 errors += 1
+
+                if isinstance(e, HttpErrorException):
+                    print(f'{e.code} -- {e.message}')
 
                 if errors > self.__errors_allowed:
                     break
@@ -136,14 +127,13 @@ def main(transfer_amount: int, per_transfer: int, allowed_errors: int, token: st
     configuration_file = open(config, 'r')
     configuration = yaml.load(configuration_file)
 
-    print(configuration)
-
     nodes_ = configuration['nodes']
     if not nodes_:
         print('nodes element is missing from configuration')
         exit(1)
 
     jobs = []
+
     for position in range(0, len(nodes_)):
         node = nodes_[position]
         sender = node['address']
@@ -153,7 +143,6 @@ def main(transfer_amount: int, per_transfer: int, allowed_errors: int, token: st
                           timeout)
         jobs.append(job)
 
-    trange = tqdm.trange(len(jobs), desc="Running transfers", position=0)
     try:
         for j in jobs:
             j.start()
@@ -166,12 +155,14 @@ def main(transfer_amount: int, per_transfer: int, allowed_errors: int, token: st
             j.terminate.set()
             j.join()
 
-    trange.update()
-    print('Starting transfers')
+        print('Service terminated')
+        exit(0)
+
+    print('Service complete')
 
 
 def shutdown_handler(_signo, _stackframe):
-    raise SystemExit
+    raise ServiceExit
 
 
 if __name__ == '__main__':
