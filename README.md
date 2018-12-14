@@ -1,6 +1,12 @@
 Collection of utilities to bootstrap a small raiden network.
 -------
 
+# About the environment
+
+The environment uses [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/en/latest/) to manage the python
+virtual environments and most of the scripts and utilities are configured around that fact.
+
+
 # Setting up the environment
 
 For the private chain setup to work you need to have parity installed since the setup uses a [Parity Dev Chain](https://wiki.parity.io/Private-development-chain)
@@ -63,9 +69,14 @@ to simulate a stable block time.
 
 # Deploying the raiden smart contracts
 
-In order for the private raiden network to work you need to deploy the smart contracts on your own.
+## Before installing
 
+You can run the `solidity.sh` script to install the proper version of `solc` in your virtual environment to be able to 
+compile the `raiden-contracts`. Currently the compilation process fails with solidity `0.5.0`.
 
+# Installation
+ 
+In order for the private raiden network to work you need to deploy the smart contracts on your private chain.
 
 ```bash
 python -m raiden_contracts.deploy raiden --rpc-provider http://127.0.0.1:8545 --private-key /home/kelsos/.ethereum/testnet/keystore/0x82641569b2062B545431cF6D7F0A418582865ba7 --gas-price 10 --gas-limit 6000000   
@@ -83,6 +94,11 @@ python -m raiden_contracts.deploy token --rpc-provider http://127.0.0.1:8545 --p
 python -m raiden_contracts.deploy register --rpc-provider http://127.0.0.1:8545 --private-key /home/kelsos/.ethereum/testnet/keystore/0x82641569b2062B545431cF6D7F0A418582865ba7 --gas-price 10 --token-address 0x28104EE15e1c70c421150865C3fb731c426929E6 --registry-address 0xA4e13D328308194c0AB4E10bB1f2B2e8d624d240
 
 ```
+
+Currently `raiden-contracts` doesn't support a single command deployment of all the contracts (raiden, token) along 
+with the registration. For this reason `scripts/deploy_testnet.py` is a script that is patched together from the 
+[deploy script](https://github.com/raiden-network/raiden-contracts/blob/master/raiden_contracts/deploy/__main__.py)
+that helps you deploy everything in a single command.
 
 # Funding the accounts
 
