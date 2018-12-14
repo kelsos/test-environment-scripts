@@ -104,7 +104,7 @@ def get_accounts() -> List[str]:
     if not testing_accounts:
         print('$TESTING_ACCOUNTS environment variable was undefined')
         sys.exit(1)
-    return testing_accounts.split(';')
+    return testing_accounts.split(':')
 
 
 if __name__ == '__main__':
