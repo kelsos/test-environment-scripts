@@ -9,6 +9,25 @@ virtual environments and most of the scripts and utilities are configured around
 
 # Setting up the environment
 
+For the virtual environment you have to run:
+
+```bash
+mkvirtualenv test-scripts
+```
+
+Activating the environment can be done by
+
+```bash
+workon test-scripts
+```
+
+Then as soon as you are in the virtual environment you can use `pip` to install the dependencies
+for the scripts:
+
+```bash
+pip install -e .
+```
+
 For the private chain setup to work you need to have parity installed since the setup uses a [Parity Dev Chain](https://wiki.parity.io/Private-development-chain)
 
 You can start by copying the example setup and getting your setup ready.
@@ -102,22 +121,48 @@ that helps you deploy everything in a single command.
 
 # Funding the accounts
 
+The send tokens script is responsible for funding all the accounts with tokens.
+
+> Please make sure to use the same keystore that you used to deploy the smart contracts.
+> This account should contain some tokens.
+
+The script will pick up the accounts on the `TESTING_ACCOUNTS` environment variable and 
+send tokens for testing to all of them.
+
 ```bash
 ./send_tokens.py --keystore-file ~/.ethereum/testnet/keystore/0x82641569b2062B545431cF6D7F0A418582865ba7 --password 123 --token 0x28104EE15e1c70c421150865C3fb731c426929E6
+```
 
+# Using raiden-up to start a local node
+
+This will start a raiden node that uses the private dev chain. The production environment will 
+be the same one with the `Red Eyes` contract version.
+
+```bash
+raiden-up -n local -a 3 -e production -p true
+```
+
+# Opening channels
+
+While you can always use the REST API or the WebUI for opening channels, there is also the `scripts/open_channels.py`.
+The script will take a `yml` configuration and will open channels to other nodes.
+
+Please make sure to include even nodes that will not open any channels, since the script automatically funds 
+all the open channels to all directions.
+
+```bash
+./scripts/open_channels.py --token 0x28104EE15e1c70c421150865C3fb731c426929E6 --config config/channels.yml
 ```
 
 # Running the transfers
 
-```bash
-./run_transfers.py --token 0x28104EE15e1c70c421150865C3fb731c426929E6 --config nodes.yml
-```
-
-# Using raiden-up for a local node
+The script for running transfers will take `yml` configuration specifying the targets of the transfers
+and the the total amount to be transferred.
 
 ```bash
-raiden-up -n local -a 3 -e production -p true -l y
+./scripts/transfers.py --token 0x28104EE15e1c70c421150865C3fb731c426929E6 --config config/transfers.yml
 ```
+
 
 # Running a local synapse (matrix server) 
 
