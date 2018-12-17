@@ -8,7 +8,7 @@ from raiden_api.api import Api
 
 
 def direct_partners(port: int, token_address: str):
-    url = f'http://localhost:{port}/api/1/channels'
+    url = f'http://localhost:{port}/api/v1/channels'
     response = requests.get(
         url,
         headers={'Content-Type': 'application/json', },
@@ -30,7 +30,7 @@ def direct_partners(port: int, token_address: str):
 
 
 def transfer(port: int, token: str, partner_address: str):
-    url = f'http://localhost:{port}/api/1/payments/{token}/{partner_address}'
+    url = f'http://localhost:{port}/api/v1/payments/{token}/{partner_address}'
     return requests.post(
         url,
         headers={'Content-Type': 'application/json', },

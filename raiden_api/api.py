@@ -11,9 +11,10 @@ class Api:
     def __init__(self, port: int, timeout: int = 60):
         self.port = port
         self.timeout = timeout
+        self.__api_base = f'http://localhost:{self.port}/api/v1'
 
     def address(self) -> AddressResponse:
-        url = f'http://localhost:{self.port}/api/1/address'
+        url = f'{self.__api_base}/address'
 
         response = requests.get(
             url,
@@ -29,7 +30,7 @@ class Api:
         return AddressResponse.from_dict(json)
 
     def payment(self, receiver: str, request: PaymentRequest, token: str) -> PaymentResponse:
-        url = f'http://localhost:{self.port}/api/1/payments/{token}/{receiver}'
+        url = f'{self.__api_base}/payments/{token}/{receiver}'
         response = requests.post(
             url,
             headers=self.__headers,

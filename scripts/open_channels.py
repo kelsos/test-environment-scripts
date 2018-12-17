@@ -10,7 +10,7 @@ from raiden_api.api import Api
 
 
 def open_channel(port: int, partner_address: str, token_address: str, funds: int):
-    url = f'http://localhost:{port}/api/1/channels'
+    url = f'http://localhost:{port}/api/v1/channels'
     return requests.put(
         url,
         headers={'Content-Type': 'application/json', },
@@ -25,7 +25,7 @@ def open_channel(port: int, partner_address: str, token_address: str, funds: int
 
 
 def deposit(port: int, token_address: str, partner_address: str, funds: int):
-    url = f'http://localhost:{port}/api/1/channels/{token_address}/{partner_address}'
+    url = f'http://localhost:{port}/api/v1/channels/{token_address}/{partner_address}'
     return requests.patch(
         url,
         headers={'Content-Type': 'application/json', },
@@ -37,7 +37,7 @@ def deposit(port: int, token_address: str, partner_address: str, funds: int):
 
 
 def channels_without_deposit(port: int, token_address: str):
-    url = f'http://localhost:{port}/api/1/channels'
+    url = f'http://localhost:{port}/api/v1/channels'
     response = requests.get(
         url,
         headers={'Content-Type': 'application/json', },
