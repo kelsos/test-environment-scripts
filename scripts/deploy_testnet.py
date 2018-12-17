@@ -46,7 +46,8 @@ def main(keystore_file: str, password: str, rpc_url: str):
     }
 
     print('Deploying test token contract')
-    deployed_token = deploy_token_contract(deployer, TOKEN_SUPPLY, TOKEN_DECIMALS, 'TestToken', 'TTT')
+    tokens = TOKEN_SUPPLY * (10 ** TOKEN_DECIMALS)
+    deployed_token = deploy_token_contract(deployer, tokens, TOKEN_DECIMALS, 'TestToken', 'TTT')
 
     abi = deployer.contract_manager.get_contract_abi(CONTRACT_TOKEN_NETWORK_REGISTRY)
 
