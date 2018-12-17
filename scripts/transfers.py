@@ -21,7 +21,6 @@ class TransferJob(threading.Thread):
     def __init__(
             self,
             port: int,
-            sender: str,
             receiver: str,
             position: int,
             total: int,
@@ -32,7 +31,6 @@ class TransferJob(threading.Thread):
     ):
         """
         :type port: int The port where the raiden node is listening from.
-        :type sender: str The address of the node sending the transfers. Used for logging purposes.
         :type receiver: str The receiver of the payment.
         :type position: int The position is used in order to show the progress bar.
         :type total: int The total amount the transfer job will send to the receiver.
@@ -42,7 +40,6 @@ class TransferJob(threading.Thread):
         """
         threading.Thread.__init__(self)
         self.terminate = threading.Event()
-        self.__sender = sender
         self.__receiver = receiver
         self.__position = position
         self.__total = total
@@ -53,13 +50,16 @@ class TransferJob(threading.Thread):
 
     def transfer(self):
 
+        address_response = self.__api.address()
+        sender = address_response.our_address
+
         pending_amount = self.__total
-        print(f'{pending_amount} in transfers of {self.__single} from {self.__sender} -> {self.__receiver}')
+        print(f'{pending_amount} in transfers of {self.__single} from {sender} -> {self.__receiver}')
         time.sleep(1)
 
         trange = tqdm.trange(
             int(self.__total / self.__single),
-            desc=f"[{self.__position}] {self.__sender} -> {self.__receiver}",
+            desc=f"[{self.__position}] {sender} -> {self.__receiver}",
             position=self.__position
         )
 
@@ -94,7 +94,7 @@ class TransferJob(threading.Thread):
                 trange.update()
 
             except Exception as e:
-                print(f'transfer from {self.__sender} failed, waiting for {secs} sec [{errors}] -> {e}')
+                print(f'transfer from {sender} failed, waiting for {secs} sec [{errors}] -> {e}')
                 time.sleep(secs)
                 errors += 1
 
@@ -110,7 +110,7 @@ class TransferJob(threading.Thread):
         if performed_iterations > 0:
             throughput = total_time / performed_iterations
 
-        print(f'Elapsed for {self.__sender} requests: {performed_iterations} {total_time} sec -> {throughput} sec/t')
+        print(f'Elapsed for {sender} requests: {performed_iterations} {total_time} sec -> {throughput} sec/t')
 
     def run(self):
         self.transfer()
@@ -136,11 +136,9 @@ def main(transfer_amount: int, per_transfer: int, allowed_errors: int, token: st
 
     for position in range(0, len(nodes_)):
         node = nodes_[position]
-        sender = node['address']
         port = node['port']
         receiver = node['target']
-        job = TransferJob(port, sender, receiver, position, transfer_amount, per_transfer, allowed_errors, token,
-                          timeout)
+        job = TransferJob(port, receiver, position, transfer_amount, per_transfer, allowed_errors, token, timeout)
         jobs.append(job)
 
     try:
