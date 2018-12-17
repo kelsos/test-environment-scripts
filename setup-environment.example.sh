@@ -14,3 +14,4 @@ export RINKEBY_RPC_URL=''
 
 alias raiden-up='"$SCRIPT_PATH"/raiden-up.sh'
 alias dev-chain-reset='parity --chain dev db kill'
+alias raiden-test="cd $SCRIPT_PATH"
