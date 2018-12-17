@@ -163,3 +163,4 @@ ignored
 /setup-environment.sh
 /logs/
 /credentials/
+/bin/
