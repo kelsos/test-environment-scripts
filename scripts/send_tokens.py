@@ -41,6 +41,10 @@ def main(keystore_file: str, password: str, rpc_url: str, accounts: str, token: 
 
 
 def send_tokens(web3, sender, amount, testing_accounts, contract, private_key):
+    balance = contract.functions.balanceOf(sender).call()
+
+    print(f'Sender ({sender}) has {balance} tokens')
+
     for receiver in testing_accounts:
         balance = contract.functions.balanceOf(receiver).call()
 
@@ -52,8 +56,9 @@ def send_tokens(web3, sender, amount, testing_accounts, contract, private_key):
 
 
 def transfer(web3: Web3, receiver: str, sender: str, wei_value: int, contract, private_key):
-    print(f'preparing to transfer {wei_value} to {receiver}')
     nonce = web3.eth.getTransactionCount(sender)
+
+    print(f'preparing to transfer {wei_value} to {receiver} [{nonce}]')
 
     transfer_tx = contract.functions.transfer(receiver, wei_value).buildTransaction({
         'chainId': web3.net.chainId,
@@ -65,8 +70,12 @@ def transfer(web3: Web3, receiver: str, sender: str, wei_value: int, contract, p
     signed_txn = web3.eth.account.signTransaction(transfer_tx, private_key=private_key)
     tx_hash = web3.eth.sendRawTransaction(signed_txn.rawTransaction)
     transaction_receipt = web3.eth.waitForTransactionReceipt(tx_hash)
-    balance = contract.functions.balanceOf(receiver).call()
-    print(f'{receiver} has a balance of {balance}')
+
+    if transaction_receipt['status'] == 1:
+        balance = contract.functions.balanceOf(receiver).call()
+        print(f'{receiver} has a balance of {balance}')
+    else:
+        print(print(f'transaction to {receiver} failed'))
 
 
 def unlock_account(web3: Web3, address: str, passphrase: str):
