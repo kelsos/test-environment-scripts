@@ -59,7 +59,7 @@ class TransferJob(threading.Thread):
 
         trange = tqdm.trange(
             int(self.__total / self.__single),
-            desc=f"[{self.__position}] {sender} -> {self.__receiver}",
+            desc=f"[{self.__position}] {sender[2:9].lower()} -> {self.__receiver[2:9].lower()}",
             position=self.__position
         )
 
