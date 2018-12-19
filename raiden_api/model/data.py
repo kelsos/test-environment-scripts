@@ -12,7 +12,7 @@ class Channel:
             total_deposit: int,
             state: str,
             settle_timeout: int,
-            reveal_timeout: int
+            reveal_timeout: int,
     ):
         self.token_network_identifier = token_network_identifier
         self.channel_identifier = channel_identifier
@@ -35,7 +35,7 @@ class Channel:
             total_deposit=int(data['total_deposit']),
             state=str(data['state']),
             settle_timeout=int(data['settle_timeout']),
-            reveal_timeout=int(data['reveal_timeout'])
+            reveal_timeout=int(data['reveal_timeout']),
         )
 
         return response

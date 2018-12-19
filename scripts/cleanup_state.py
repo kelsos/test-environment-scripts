@@ -1,21 +1,24 @@
 #!/usr/bin/env python
-from datetime import datetime
-
-import click
 import os
 import sys
-import time
-from pathlib import Path
 import tarfile
-from typing import List
+import time
+from datetime import datetime
+from pathlib import Path
 from shutil import rmtree
+from typing import List
+
+import click
 
 
 @click.command()
 @click.option("--chain-id", required=True, type=int)
-@click.option("--archive-directory", required=True, type=click.Path(exists=True, dir_okay=True, file_okay=False))
+@click.option("--archive-directory",
+              required=True,
+              type=click.Path(exists=True, dir_okay=True, file_okay=False),
+              )
 @click.option("--delete", type=bool, default=False)
-def main(chain_id: int, archive_directory: os.path, delete: bool):
+def main(chain_id: int, archive_directory: str, delete: bool):
     accounts = get_accounts()
     raiden_dir = get_raiden_dir()
 
@@ -68,7 +71,7 @@ def get_db_directories(accounts, raiden_dir, chain_id: int):
     return directories_for_chain
 
 
-def tar_name(log_directory: os.path, chain_id: int) -> os.path:
+def tar_name(log_directory: str, chain_id: int) -> str:
     label = datetime.utcfromtimestamp(time.time()).strftime('%Y%m%d_%H%M%S')
     name = f"{label}_netid_{chain_id}_raiden_db_logs.tar.xz"
     return os.path.join(log_directory, name)

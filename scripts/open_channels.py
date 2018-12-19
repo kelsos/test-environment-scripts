@@ -1,68 +1,79 @@
 #!/usr/bin/env python
-import os
+import threading
+import typing
+from typing import List
 
 import click
-import requests
-import threading
 import yaml
-
 from raiden_api.api import Api
+from raiden_api.model.exceptions import HttpErrorException
+from raiden_api.model.requests import OpenChannelRequest, ManageChannelRequest
 
 
-def open_channel(port: int, partner_address: str, token_address: str, funds: int):
-    url = f'http://localhost:{port}/api/v1/channels'
-    return requests.put(
-        url,
-        headers={'Content-Type': 'application/json', },
-        json={
-            'partner_address': partner_address,
-            'token_address': token_address,
-            'total_deposit': funds,
-            "settle_timeout": 500
-        },
-        timeout=5 * 60
-    )
+class NodeConfig:
+    def __init__(
+            self,
+            address: str,
+            port: int,
+            funds: int,
+            targets: List[str] = None,
+    ):
+        self.address = address
+        self.port = port
+        self.funds = funds
+        self.targets = targets
+
+    @classmethod
+    def from_dict(cls, data: typing.Dict[str, typing.Any]) -> 'NodeConfig':
+
+        targets: typing.Optional[List[str]] = None
+
+        if 'targets' in data:
+            targets = data['targets']
+
+        response = cls(
+            address=str(data['address']),
+            port=int(data['port']),
+            funds=int(data['funds']),
+            targets=targets,
+        )
+
+        return response
 
 
-def deposit(port: int, token_address: str, partner_address: str, funds: int):
-    url = f'http://localhost:{port}/api/v1/channels/{token_address}/{partner_address}'
-    return requests.patch(
-        url,
-        headers={'Content-Type': 'application/json', },
-        json={
-            'total_deposit': funds,
-        },
-        timeout=5 * 60
-    ).status_code
+class OpenJob(threading.Thread):
+    def __init__(self, api: Api, node: NodeConfig, token_address: str):
+        threading.Thread.__init__(self)
+        self.__api = api
+        self.__node = node
+        self.__token_address = token_address
 
+    def run(self):
+        address_response = self.__api.address()
+        address = address_response.our_address
 
-def channels_without_deposit(port: int, token_address: str):
-    url = f'http://localhost:{port}/api/v1/channels'
-    response = requests.get(
-        url,
-        headers={'Content-Type': 'application/json', },
-        timeout=5 * 60
-    )
+        if self.__node.targets is None:
+            print(f'Node {address} has no targets -- skipping')
+            return
 
-    if response.status_code != 200:
-        print(f'Could not get channels for {token_address} [{response.status_code}]')
-        return
+        for partner_address in self.__node.targets:
 
-    channels_response = response.json()
-
-    channels = []
-
-    for channel in channels_response:
-        if channel['total_deposit'] == 0:
-            channels.append(channel['partner_address'])
-
-    return channels
+            try:
+                request = OpenChannelRequest(
+                    partner_address,
+                    self.__token_address,
+                    self.__node.funds,
+                )
+                response = self.__api.open_channel(request)
+                print(f'Successfully opened channel from {address} to {response.partner_address}')
+            except HttpErrorException as e:
+                print(f'error from {address} to {partner_address} [{str(e)}]')
 
 
 @click.command()
 @click.option('--token', required=True, type=str)
 @click.option("--config", required=True, type=click.Path(exists=True, dir_okay=False))
-def main(token: str, config: os.path):
+def main(token: str, config: str):
     configuration_file = open(config, 'r')
     configuration = yaml.load(configuration_file)
 
@@ -74,46 +85,37 @@ def main(token: str, config: os.path):
 
     token_address = token
 
-    threads = []
-    for target in nodes_:
-        thread = threading.Thread(target=handle_opening, args=(target, token_address))
-        threads.append(thread)
-        thread.start()
+    nodes: List[NodeConfig] = list(map(lambda x: NodeConfig.from_dict(x), nodes_))
+    apis: List[Api] = list(map(lambda x: Api(x.port), nodes))
 
-    for thread in threads:
-        thread.join()
+    jobs = []
 
-    for target in nodes_:
-        port = target['port']
-        funds = target['funds']
+    number_of_nodes = len(nodes)
+    for index in range(number_of_nodes):
+        job = OpenJob(apis[index], nodes[index], token_address)
+        jobs.append(job)
+        job.start()
 
-        without_deposit = channels_without_deposit(port, token_address)
+    for job in jobs:
+        job.join()
 
-        print(f'funding {len(without_deposit)} channels for {port}')
+    for index in range(number_of_nodes):
+        node = nodes[index]
+        api = apis[index]
+        funds = node.funds
+
+        all_channels = filter(lambda x: x.total_deposit == 0, api.channels())
+        without_deposit = list(map(lambda x: x.partner_address, all_channels))
+
+        print(f'funding {len(without_deposit)} channels for {node.port}')
 
         for no_funds_partner_address in without_deposit:
-            status = deposit(port, token_address, no_funds_partner_address, funds)
-            if status != 200:
-                print(f'deposit to {no_funds_partner_address} failed')
-            else:
-                print(f'added {funds} total_deposit to {no_funds_partner_address}')
-
-
-def handle_opening(target, token_address: str):
-    targets = target['targets'] if 'targets' in target else []
-    port = target['port']
-    funds = target['funds']
-
-    api = Api(port)
-
-    address = api.address()
-
-    for partner_address in targets:
-        response = open_channel(port, partner_address, token_address, funds)
-        if response.status_code == 201:
-            print(f'Successfully opened channels from {address.our_address} to {partner_address}')
-        else:
-            print(f'error from {target["address"]} to {partner_address} [{response.content}]')
+            try:
+                deposit = ManageChannelRequest(total_deposit=funds)
+                channel = api.manage_channel(deposit, token_address, no_funds_partner_address)
+                print(f'new total_deposit: {channel.total_deposit} to {channel.partner_address}')
+            except HttpErrorException as e:
+                print(f'deposit to {no_funds_partner_address} failed {str(e)}')
 
 
 if __name__ == '__main__':

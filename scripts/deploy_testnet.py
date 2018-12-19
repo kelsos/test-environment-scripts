@@ -2,8 +2,12 @@
 import click
 from eth_account import Account
 from raiden_contracts.constants import CONTRACT_TOKEN_NETWORK_REGISTRY
-from raiden_contracts.deploy.__main__ import ContractDeployer, deploy_raiden_contracts, deploy_token_contract, \
-    register_token_network
+from raiden_contracts.deploy.__main__ import (
+    ContractDeployer,
+    deploy_raiden_contracts,
+    deploy_token_contract,
+    register_token_network,
+)
 from web3 import HTTPProvider, Web3
 from web3.middleware import geth_poa_middleware
 
@@ -16,7 +20,11 @@ GAS_PRICE = 10
 
 @click.command()
 @click.option("--keystore-file", required=True, type=click.Path(exists=True, dir_okay=False))
-@click.password_option("--password", envvar="ACCOUNT_PASSWORD", required=True, confirmation_prompt=False)
+@click.password_option(
+    "--password",
+    envvar="ACCOUNT_PASSWORD",
+    confirmation_prompt=False,
+)
 @click.option("--rpc-url", default="http://localhost:8545")
 def main(keystore_file: str, password: str, rpc_url: str):
     web3 = Web3(HTTPProvider(rpc_url, request_kwargs={'timeout': 60}))
@@ -59,7 +67,7 @@ def main(keystore_file: str, password: str, rpc_url: str):
         private_key=private_key,
         token_registry_abi=abi,
         token_registry_address=deployed_contracts[CONTRACT_TOKEN_NETWORK_REGISTRY],
-        token_address=token_address
+        token_address=token_address,
     )
 
     print(f'Token Deployed at: {token_address}')

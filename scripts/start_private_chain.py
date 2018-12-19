@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 
-import sys
-import time
-
-import click
 import signal
 import subprocess
+import sys
 import threading
+import time
 from typing import List
+
+import click
 from web3 import HTTPProvider, Web3
 
 WEI_TO_ETH = 10 ** 18
@@ -37,9 +37,8 @@ class MineJob(threading.Thread):
 
 
 def start_parity():
-    return subprocess.Popen("parity --chain dev --reseal-min-period=0 --jsonrpc-apis all --jsonrpc-cors all",
-                            shell=True,
-                            stdout=subprocess.PIPE)
+    cmd = "parity --chain dev --reseal-min-period=0 --jsonrpc-apis all --jsonrpc-cors all"
+    return subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
 
 
 def service_shutdown(signum, frame):
@@ -50,6 +49,7 @@ def service_shutdown(signum, frame):
 def send(web3: Web3, sender: str, receiver: str, wei_value: int):
     unlock_account(sender, web3)
     transaction = web3.eth.sendTransaction({'to': receiver, 'from': sender, 'value': wei_value})
+    print(transaction)
     print(f'{receiver} has a balance of {web3.eth.getBalance(receiver)}')
 
 
@@ -64,7 +64,6 @@ def unlock_account(address: str, web3: Web3):
 @click.option('--accounts', envvar="TESTING_ACCOUNTS", required=True)
 @click.option('--block-time', type=int, default=1)
 def main(rpc_url: str, accounts: str, block_time):
-
     testing_accounts = accounts.split(':')
     web3 = Web3(HTTPProvider(rpc_url))
     sender = web3.toChecksumAddress('0x00a329c0648769a73afac7f9381e08fb43dbea72')

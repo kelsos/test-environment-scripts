@@ -1,12 +1,12 @@
 #!/usr/bin/env python
+import json
 import sys
 
 import click
-import json
+from eth_account.account import Account
 from eth_utils import to_checksum_address
 from web3 import Web3
 from web3.providers import HTTPProvider
-from eth_account.account import Account
 
 WEI_TO_ETH = 10 ** 18
 ERC20_ABI = json.loads(
@@ -20,7 +20,14 @@ ERC20_ABI = json.loads(
 @click.option('--accounts', envvar="TESTING_ACCOUNTS", required=True)
 @click.option('--token', required=True)
 @click.option('--amount', default=1, type=float)
-def main(keystore_file: str, password: str, rpc_url: str, accounts: str, token: str, amount: float):
+def main(
+        keystore_file: str,
+        password: str,
+        rpc_url: str,
+        accounts: str,
+        token: str,
+        amount: float,
+):
     testing_accounts = accounts.split(':')
 
     web3 = Web3(HTTPProvider(rpc_url))
@@ -30,9 +37,10 @@ def main(keystore_file: str, password: str, rpc_url: str, accounts: str, token: 
         private_key = web3.eth.account.decrypt(encrypted_key, password)
         account = Account.privateKeyToAccount(private_key)
 
-    print(f'Using account {to_checksum_address(account.address)} to fund {len(testing_accounts)} accounts')
+    checksum_address = to_checksum_address(account.address)
+    print(f'Using account {checksum_address} to fund {len(testing_accounts)} accounts')
 
-    sender = to_checksum_address(account.address)
+    sender = checksum_address
     erc20 = web3.eth.contract(address=token, abi=ERC20_ABI)
 
     wei_amount = int(amount * WEI_TO_ETH)

@@ -6,7 +6,6 @@ import time
 import click
 import tqdm
 import yaml
-
 from raiden_api.api import Api
 from raiden_api.model.exceptions import HttpErrorException
 from raiden_api.model.requests import PaymentRequest
@@ -27,7 +26,7 @@ class TransferJob(threading.Thread):
             single: int,
             errors_allowed: int,
             token: str,
-            timeout: int
+            timeout: int,
     ):
         """
         :type port: int The port where the raiden node is listening from.
@@ -35,7 +34,8 @@ class TransferJob(threading.Thread):
         :type position: int The position is used in order to show the progress bar.
         :type total: int The total amount the transfer job will send to the receiver.
         :type single: int The amount that will be send on each transfer in every transfer.
-        :type errors_allowed: int The number of errors that allowed to occur before the thread terminates.
+        :type errors_allowed: int The number of errors that allowed to occur before the thread
+        terminates.
         :type token: str The token for which the transfer will take place.
         """
         threading.Thread.__init__(self)
@@ -54,13 +54,14 @@ class TransferJob(threading.Thread):
         sender = address_response.our_address
 
         pending_amount = self.__total
-        print(f'{pending_amount} in transfers of {self.__single} from {sender} -> {self.__receiver}')
+        print(
+            f'{pending_amount} in transfers of {self.__single} from {sender} -> {self.__receiver}')
         time.sleep(1)
 
         trange = tqdm.trange(
             int(self.__total / self.__single),
             desc=f"[{self.__position}] {sender[2:9].lower()} -> {self.__receiver[2:9].lower()}",
-            position=self.__position
+            position=self.__position,
         )
 
         total_time = 0
@@ -68,7 +69,7 @@ class TransferJob(threading.Thread):
         errors = 0
 
         while pending_amount > 0 and not self.terminate.is_set():
-            secs = 30 + (10 * errors)
+            secs = 60 + (10 * errors)
             try:
                 start_time = time.time()
                 identifier = int(start_time)
@@ -78,14 +79,18 @@ class TransferJob(threading.Thread):
                     identifier=identifier,
                 )
 
-                payment_response = self.__api.payment(self.__receiver, payment_request, self.__token)
+                payment_response = self.__api.payment(
+                    self.__receiver,
+                    payment_request,
+                    self.__token,
+                )
 
                 duration = time.time() - start_time
                 response_identifier = payment_response.identifier
 
                 if response_identifier != identifier:
-                    message = f'Identifier mismatch expected {identifier} got {response_identifier}'
-                    print(message)
+                    message = f'Identifier mismatch:' \
+                        f'expected {identifier} got {response_identifier}'
                     raise Exception(message)
 
                 pending_amount -= self.__single
@@ -99,7 +104,7 @@ class TransferJob(threading.Thread):
                 errors += 1
 
                 if isinstance(e, HttpErrorException):
-                    print(f'{e.code} -- {e.message}')
+                    print(f'{e.code} -- {str(e)}')
 
                 if errors > self.__errors_allowed:
                     break
@@ -110,7 +115,8 @@ class TransferJob(threading.Thread):
         if performed_iterations > 0:
             throughput = total_time / performed_iterations
 
-        print(f'Elapsed for {sender} requests: {performed_iterations} {total_time} sec -> {throughput} sec/t')
+        print(f'Elapsed for {sender} requests:'
+              f' {performed_iterations} {total_time} sec -> {throughput} sec/t')
 
     def run(self):
         self.transfer()
@@ -123,7 +129,8 @@ class TransferJob(threading.Thread):
 @click.option('--token', type=str, required=True)
 @click.option("--config", required=True, type=click.Path(exists=True, dir_okay=False))
 @click.option('--timeout', type=int, default=60)
-def main(transfer_amount: int, per_transfer: int, allowed_errors: int, token: str, config, timeout: int):
+def main(transfer_amount: int, per_transfer: int, allowed_errors: int, token: str, config,
+         timeout: int):
     configuration_file = open(config, 'r')
     configuration = yaml.load(configuration_file)
 
@@ -138,7 +145,8 @@ def main(transfer_amount: int, per_transfer: int, allowed_errors: int, token: st
         node = nodes_[position]
         port = node['port']
         receiver = node['target']
-        job = TransferJob(port, receiver, position, transfer_amount, per_transfer, allowed_errors, token, timeout)
+        job = TransferJob(port, receiver, position, transfer_amount, per_transfer, allowed_errors,
+                          token, timeout)
         jobs.append(job)
 
     try:

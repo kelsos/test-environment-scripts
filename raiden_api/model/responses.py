@@ -13,7 +13,14 @@ class AddressResponse:
 
 class PaymentResponse:
 
-    def __init__(self, initiator_address: str, target_address: str, token_address: str, amount: int, identifier: int):
+    def __init__(
+            self,
+            initiator_address: str,
+            target_address: str,
+            token_address: str,
+            amount: int,
+            identifier: int,
+    ):
         self.initiator_address = initiator_address
         self.target_address = target_address
         self.token_address = token_address
