@@ -129,8 +129,14 @@ class TransferJob(threading.Thread):
 @click.option('--token', type=str, required=True)
 @click.option("--config", required=True, type=click.Path(exists=True, dir_okay=False))
 @click.option('--timeout', type=int, default=60)
-def main(transfer_amount: int, per_transfer: int, allowed_errors: int, token: str, config,
-         timeout: int):
+def main(
+        transfer_amount: int,
+        per_transfer: int,
+        allowed_errors: int,
+        token: str,
+        config,
+        timeout: int,
+):
     configuration_file = open(config, 'r')
     configuration = yaml.load(configuration_file)
 
@@ -145,8 +151,16 @@ def main(transfer_amount: int, per_transfer: int, allowed_errors: int, token: st
         node = nodes_[position]
         port = node['port']
         receiver = node['target']
-        job = TransferJob(port, receiver, position, transfer_amount, per_transfer, allowed_errors,
-                          token, timeout)
+        job = TransferJob(
+            port,
+            receiver,
+            position,
+            transfer_amount,
+            per_transfer,
+            allowed_errors,
+            token,
+            timeout,
+        )
         jobs.append(job)
 
     try:
@@ -155,6 +169,9 @@ def main(transfer_amount: int, per_transfer: int, allowed_errors: int, token: st
 
         while True:
             time.sleep(1)
+            alive = filter(lambda j: j.is_alive(), jobs)
+            if len(list(alive)) == 0:
+                break
 
     except ServiceExit:
         for j in jobs:
