@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script>
+
+        function domReady(fn) {
+            // If we're early to the party
+            document.addEventListener("DOMContentLoaded", fn);
+            // If late; I mean on time.
+            if (document.readyState === "interactive" || document.readyState === "complete") {
+                fn();
+            }
+        }
+
+        domReady(() => updateDom(5500, 0, 5));
+
+        function updateDom(basePort, startPort, endPort) {
+
+            let container = document.getElementById('webui_container');
+            container.innerText = '';
+
+            for (let i = startPort; i <= endPort; i++) {
+                container.innerHTML += `
+                <div style="float: left">
+                    <h3>Port: ${basePort + i}</h3>
+                    <iframe width="800" height="600" src="http://localhost:${basePort + i}/ui/channels"></iframe>
+                </div>
+                `
+            }
+        }
+
+        function click() {
+            let basePort = document.getElementById('base_port');
+            let startPort = document.getElementById('start_port');
+            let endPort = document.getElementById('end_port');
+
+            updateDom(basePort.value, startPort.value, endPort.value)
+        }
+
+
+    </script>
+</head>
+<body>
+
+<div>
+    <input id="base_port" value="5500" type="number" placeholder="Base port">
+    <input id="start_port" value="0" type="number" placeholder="Start">
+    <input id="end_port" value="5" type="number" placeholder="End">
+
+    <button onclick="click()">Load WebUI iframes</button>
+</div>
+
+<div id="webui_container" style="float: left">
+
+</div>
+
+
+</body>
+</html>
