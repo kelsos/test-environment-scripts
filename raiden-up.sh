@@ -18,19 +18,19 @@ p) PRIVATE="${OPTARG}";;
 esac
 done
 
-if [[ ! "$TESTING_ACCOUNTS" ]]
+if [[ ! "$RT_ENV__TESTING_ACCOUNTS" ]]
 then
     echo "Expected accounts in environment variable TESTING_ACCOUNTS separated by colon e.g. account1:account2"
     exit 1
 fi
 
-if [[ ! "$TESTING_KEYS_DIR" ]]
+if [[ ! "$RT_ENV__TESTING_KEYS_DIR" ]]
 then
     echo 'Missing testing keys directory'
     exit 1
 fi
 
-IFS=': ' read -r -a ACCOUNTS <<< "$TESTING_ACCOUNTS"
+IFS=': ' read -r -a ACCOUNTS <<< "$RT_ENV__TESTING_ACCOUNTS"
 
 if [[ ! "$NETWORK" ]]
 then
@@ -54,17 +54,17 @@ NO_SYNC=''
 if [[ "$NETWORK" = 'ropsten' ]]
 then
     NETWORK_PORT=0
-    RPC_ENDPOINT="$ROPSTEN_RPC_URL"
+    RPC_ENDPOINT="$RT_ENV__ROPSTEN_RPC_URL"
     NETWORK_ID=3
 elif [[ "$NETWORK" = 'rinkeby' ]]
 then
     NETWORK_PORT=1
-    RPC_ENDPOINT="$RINKEBY_RPC_URL"
+    RPC_ENDPOINT="$RT_ENV__RINKEBY_RPC_URL"
     NETWORK_ID=4
 elif [[ "$NETWORK" = 'kovan' ]]
 then
     NETWORK_PORT=2
-    RPC_ENDPOINT="$KOVAN_RPC_URL"
+    RPC_ENDPOINT="$RT_ENV__KOVAN_RPC_URL"
     NETWORK_ID=42
 elif [[ "$NETWORK" ]]
 then
@@ -76,6 +76,8 @@ else
     echo '-n should be "ropsten", "rinkeby" or "kovan"'
     exit 1
 fi
+
+echo "Using RPC endpoint $RPC_ENDPOINT"
 
 if [[ "$LOCAL_TRANSPORT" = 'y' ]]
 then
@@ -124,5 +126,5 @@ fi
 
 echo "webui should be available shortly at http://localhost:$PORT"
 
-${BINARY} --keystore-path  ~/.ethereum/testnet/keystore --log-config "raiden:DEBUG" --api-address localhost:"$PORT" --eth-rpc-endpoint "$RPC_ENDPOINT" --accept-disclaimer --network-id "$NETWORK_ID" --environment-type  "$ENVIROMENT" --address "$ADDRESS" --password-file "$TESTING_KEYS_DIR/$ADDRESS" ${LOCAL_TRANSPORT} ${NO_SYNC} ${PRIVATE_NETWORK}
+${BINARY} --keystore-path  ~/.ethereum/testnet/keystore --log-config "raiden:DEBUG" --api-address localhost:"$PORT" --eth-rpc-endpoint "$RPC_ENDPOINT" --accept-disclaimer --network-id "$NETWORK_ID" --environment-type  "$ENVIROMENT" --address "$ADDRESS" --password-file "$RT_ENV__TESTING_KEYS_DIR/$ADDRESS" ${LOCAL_TRANSPORT} ${NO_SYNC} ${PRIVATE_NETWORK}
 

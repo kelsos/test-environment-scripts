@@ -48,7 +48,7 @@ This also provides the `dev-chain-reset` alias that is used to reset the develop
 In the `setup-environment.sh` script the accounts should be `:` separated
 
 ```bash
-export TESTING_ACCOUNTS='account1:account2:account3'
+export RT_ENV__TESTING_ACCOUNTS='account1:account2:account3'
 ```
 
 The passphrases should be stored in individual text files with filenames 'account1', 'account2' etc with the passphrase inside.
@@ -67,7 +67,7 @@ Then you can call the script
 The following flags are available for the script.
 
 * -n: network (can be 'rinkeby', 'ropsten' or 'kovan')
-* -a: account (the index of the account in `TESTING_ACCOUNTS` 0 is the first account)
+* -a: account (the index of the account in `RT_ENV__TESTING_ACCOUNTS` 0 is the first account)
 * -e: environment (production/development)
 * -l: local transport **y** (if the option is specified the *transport01.raiden.network* is used instead)
 * -b: path to the binary. (If not specified it will used raiden from the virtual enviroment else it will use the specified binary)
@@ -77,7 +77,7 @@ The following flags are available for the script.
 # Starting a the private chain
 
 This is a small utility that starts a parity dev chain with RPC enabled.
-It also funds the accounts that are in the `TESTING_ACCOUNTS` environment variable and then
+It also funds the accounts that are in the `RT_ENV__TESTING_ACCOUNTS` environment variable and then
 sends a single transfer from the default account to the first account every `--block-time` seconds
 to simulate a stable block time.
 
@@ -126,7 +126,7 @@ The send tokens script is responsible for funding all the accounts with tokens.
 > Please make sure to use the same keystore that you used to deploy the smart contracts.
 > This account should contain some tokens.
 
-The script will pick up the accounts on the `TESTING_ACCOUNTS` environment variable and 
+The script will pick up the accounts on the `RT_ENV__TESTING_ACCOUNTS` environment variable and 
 send tokens for testing to all of them.
 
 ```bash

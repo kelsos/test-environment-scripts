@@ -17,7 +17,7 @@ ERC20_ABI = json.loads(
 @click.option("--keystore-file", required=True, type=click.Path(exists=True, dir_okay=False))
 @click.password_option("--password", envvar="ACCOUNT_PASSWORD", required=True)
 @click.option("--rpc-url", default="http://localhost:8545")
-@click.option('--accounts', envvar="TESTING_ACCOUNTS", required=True)
+@click.option('--accounts', envvar="RT_ENV__TESTING_ACCOUNTS", required=True)
 @click.option('--token', required=True)
 @click.option('--amount', default=1, type=float)
 def main(

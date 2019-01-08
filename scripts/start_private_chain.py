@@ -61,7 +61,7 @@ def unlock_account(address: str, web3: Web3):
 
 @click.command()
 @click.option("--rpc-url", default="http://localhost:8545")
-@click.option('--accounts', envvar="TESTING_ACCOUNTS", required=True)
+@click.option('--accounts', envvar="RT_ENV__TESTING_ACCOUNTS", required=True)
 @click.option('--block-time', type=int, default=1)
 def main(rpc_url: str, accounts: str, block_time):
     testing_accounts = accounts.split(':')
