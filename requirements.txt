@@ -16,7 +16,7 @@ idna==2.8
 lru-dict==1.1.6
 parsimonious==0.8.1
 pycryptodome==3.7.2
-PyYAML==3.13
+PyYAML==4.2b1
 requests==2.21.0
 rlp==1.0.3
 six==1.12.0
