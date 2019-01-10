@@ -107,9 +107,9 @@ def get_raiden_dir():
 
 
 def get_accounts() -> List[str]:
-    testing_accounts = os.environ['TESTING_ACCOUNTS']
+    testing_accounts = os.environ['RT_ENV__TESTING_ACCOUNTS']
     if not testing_accounts:
-        print('$TESTING_ACCOUNTS environment variable was undefined')
+        print('$RT_ENV_TESTING_ACCOUNTS environment variable was undefined')
         sys.exit(1)
     return testing_accounts.split(':')
 
