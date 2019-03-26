@@ -14,6 +14,7 @@ For the virtual environment you have to run:
 ```bash
 mkvirtualenv test-scripts
 ```
+(if `mkvirtualenv` is not found, follow [how to install mkvirtualenv](./how-to-insatall-mkvirtualenv.md).)
 
 Activating the environment can be done by
 
