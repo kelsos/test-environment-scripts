@@ -14,7 +14,7 @@ For the virtual environment you have to run:
 ```bash
 mkvirtualenv -p python3.7 test-scripts
 ```
-(if `mkvirtualenv` is not found, follow [how to install mkvirtualenv](./how-to-insatall-mkvirtualenv.md).)
+(if `mkvirtualenv` is not found, follow [how to install mkvirtualenv](./how-to-install-mkvirtualenv.md).)
 
 Activating the environment can be done by
 
