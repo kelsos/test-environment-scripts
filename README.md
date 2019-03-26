@@ -31,7 +31,7 @@ for the scripts:
 pip install -e .
 ```
 
-For the private chain setup to work you need to have parity installed since the setup uses a [Parity Dev Chain](https://wiki.parity.io/Private-development-chain)
+For the private chain setup to work you need to have parity installed since the setup uses a [Parity Dev Chain](https://wiki.parity.io/Private-development-chain).  `parity` command should be in the `PATH`.
 
 You can start by copying the example setup and getting your setup ready.
 
