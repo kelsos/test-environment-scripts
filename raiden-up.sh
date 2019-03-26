@@ -107,7 +107,7 @@ if [[ ! "$BINARY" ]]
 then
     echo 'Activating virtual enviroment'
     export WORKON_HOME="$HOME/.virtualenvs"
-    source /usr/bin/virtualenvwrapper.sh
+    source `which virtualenvwrapper.sh`
     workon raiden
     BINARY=raiden
 else
