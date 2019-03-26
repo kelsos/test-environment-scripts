@@ -12,7 +12,7 @@ virtual environments and most of the scripts and utilities are configured around
 For the virtual environment you have to run:
 
 ```bash
-mkvirtualenv test-scripts
+mkvirtualenv -p python3.7 test-scripts
 ```
 (if `mkvirtualenv` is not found, follow [how to install mkvirtualenv](./how-to-insatall-mkvirtualenv.md).)
 
