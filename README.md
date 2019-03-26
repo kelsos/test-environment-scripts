@@ -6,6 +6,8 @@ Collection of utilities to bootstrap a small raiden network.
 The environment uses [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/en/latest/) to manage the python
 virtual environments and most of the scripts and utilities are configured around that fact.
 
+The virtualenvwrapper can be installed anywhere in the system but it has to be in the `PATH` for the script to use it.
+
 
 # Setting up the environment
 
