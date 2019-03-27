@@ -143,6 +143,39 @@ with the registration. For this reason `scripts/deploy_testnet.py` is a script t
 [deploy script](https://github.com/raiden-network/raiden-contracts/blob/master/raiden_contracts/deploy/__main__.py)
 that helps you deploy everything in a single command.
 
+### Using the deployment script
+
+The purpose of this script is to help you easily deploy a test environment,
+with one pre-registered token.
+
+
+#### Production Environment
+
+If you want to setup a similar environment to the raiden `Red Eyes` release then you have to 
+just run the `scripts/deploy_testnet.py` script.
+
+This will install the `0.4.0` version of the `raiden-contracts` with the security limits and a
+single registered token.
+
+
+```
+./scripts/deploy_testnet.py --keystore-file /home/kelsos/.ethereum/testnet/keystore/0x82641569b2062B545431cF6D7F0A418582865ba7 --password 12345678
+```
+
+Then you have to start raiden in with the `production` environment flag.
+
+#### Development Environment
+
+If you want to have a development environment you need to add the `--development` flag when calling 
+the deployment script.
+
+
+```bash
+./scripts/deploy_testnet.py --keystore-file /home/kelsos/.ethereum/testnet/keystore/0x82641569b2062B545431cF6D7F0A418582865ba7 --password 12345678 --development
+```
+
+In order to use this contracts raiden should be started with the `development` environment flag.
+
 ## Funding the accounts
 
 The send tokens script is responsible for funding all the accounts with tokens.
