@@ -33,20 +33,13 @@ pip install -e .
 
 For the private chain setup to work you need to have parity installed since the setup uses a [Parity Dev Chain](https://wiki.parity.io/Private-development-chain).  `parity` command should be in the `PATH`.
 
+## Preparing setup-environment.sh
+
 You can start by copying the example setup and getting your setup ready.
 
 ```bash
 cp setup-environment.example.sh setup-environment.sh
 ```
-
-Then source the `setup-environment.sh` to load the environment.
-
-```bash
-source setup-environment.sh
-```
-
-This provides an alias `raiden-up` that can be used to easily start raiden nodes.
-This also provides the `dev-chain-reset` alias that is used to reset the development chain.
 
 In the `setup-environment.sh` script the accounts should be `:` separated
 
@@ -57,6 +50,16 @@ export RT_ENV__TESTING_ACCOUNTS='account1:account2:account3'
 The passphrases should be stored in individual text files with filenames 'account1', 'account2' etc with the passphrase inside.
 The account name should be prefixed with `0x` and the account should be in checksum format.
 
+## Loading setup-environment.sh
+
+Then source the `setup-environment.sh` to load the environment.
+
+```bash
+source setup-environment.sh
+```
+
+This provides an alias `raiden-up` that can be used to easily start raiden nodes.
+This also provides the `dev-chain-reset` alias that is used to reset the development chain.
 
 # Using the script
 
