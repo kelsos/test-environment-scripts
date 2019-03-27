@@ -99,7 +99,6 @@ The following flags are available for the script.
 * -b: path to the binary. (If not specified it will used raiden from the virtual enviroment else it will use the specified binary)
 * -p: private chain setup. (This will pass information to raiden to work with the private chain) *You might need to change the addresses dependending on the deployment on the parity dev chain)
 
-
 ## Starting a the private chain
 
 This is a small utility that starts a parity dev chain with RPC enabled.
@@ -115,7 +114,7 @@ to simulate a stable block time.
 
 ## Before installing
 
-You can run the `solidity.sh` script to install the proper version of `solc` in your virtual environment to be able to 
+You can run the `solidity.sh` script to install the proper version of `solc` in your virtual environment to be able to
 compile the `raiden-contracts`. Currently the compilation process fails with solidity `0.5.0`.
 
 ## Installation
@@ -134,13 +133,13 @@ python -m raiden_contracts.deploy token --rpc-provider http://127.0.0.1:8545 --p
 
 ## Registering the test token
 
-```bash 
+```bash
 python -m raiden_contracts.deploy register --rpc-provider http://127.0.0.1:8545 --private-key /home/kelsos/.ethereum/testnet/keystore/0x82641569b2062B545431cF6D7F0A418582865ba7 --gas-price 10 --token-address 0x28104EE15e1c70c421150865C3fb731c426929E6 --registry-address 0xA4e13D328308194c0AB4E10bB1f2B2e8d624d240
 
 ```
 
-Currently `raiden-contracts` doesn't support a single command deployment of all the contracts (raiden, token) along 
-with the registration. For this reason `scripts/deploy_testnet.py` is a script that is patched together from the 
+Currently `raiden-contracts` doesn't support a single command deployment of all the contracts (raiden, token) along
+with the registration. For this reason `scripts/deploy_testnet.py` is a script that is patched together from the
 [deploy script](https://github.com/raiden-network/raiden-contracts/blob/master/raiden_contracts/deploy/__main__.py)
 that helps you deploy everything in a single command.
 
@@ -151,7 +150,7 @@ The send tokens script is responsible for funding all the accounts with tokens.
 > Please make sure to use the same keystore that you used to deploy the smart contracts.
 > This account should contain some tokens.
 
-The script will pick up the accounts on the `RT_ENV__TESTING_ACCOUNTS` environment variable and 
+The script will pick up the accounts on the `RT_ENV__TESTING_ACCOUNTS` environment variable and
 send tokens for testing to all of them.
 
 ```bash
@@ -160,7 +159,7 @@ send tokens for testing to all of them.
 
 ## Using raiden-up to start a local node
 
-This will start a raiden node that uses the private dev chain. The production environment will 
+This will start a raiden node that uses the private dev chain. The production environment will
 be the same one with the `Red Eyes` contract version.
 
 ```bash
@@ -172,7 +171,7 @@ raiden-up -n local -a 3 -e production -p true
 While you can always use the REST API or the WebUI for opening channels, there is also the `scripts/open_channels.py`.
 The script will take a `yml` configuration and will open channels to other nodes.
 
-Please make sure to include even nodes that will not open any channels, since the script automatically funds 
+Please make sure to include even nodes that will not open any channels, since the script automatically funds
 all the open channels to all directions.
 
 ```bash
@@ -188,7 +187,7 @@ and the the total amount to be transferred.
 ./scripts/transfers.py --token 0x28104EE15e1c70c421150865C3fb731c426929E6 --config config/transfers.yml
 ```
 
-## Running a local synapse (matrix server) 
+## Running a local synapse (matrix server)
 
 > Currently using a local synapse version is not working due to a crash on raiden client.
 
