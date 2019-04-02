@@ -25,11 +25,7 @@ UNLIMITED = 11579208923731619542357098500868790785326998466564056403945758400791
 
 @click.command()
 @click.option("--keystore-file", required=True, type=click.Path(exists=True, dir_okay=False))
-@click.password_option(
-    "--password",
-    envvar="ACCOUNT_PASSWORD",
-    confirmation_prompt=False,
-)
+@click.password_option("--password", envvar="ACCOUNT_PASSWORD", confirmation_prompt=False)
 @click.option("--rpc-url", default="http://localhost:8545")
 @click.option("--development", is_flag=True)
 def main(keystore_file: str, password: str, rpc_url: str, development: bool):
@@ -72,8 +68,7 @@ def main(keystore_file: str, password: str, rpc_url: str, development: bool):
 
     print('Deploying raiden contracts')
     deployed_contract_info = deploy_raiden_contracts(
-        deployer=deployer,
-        max_num_of_token_networks=max_num_of_networks,
+        deployer=deployer, max_num_of_token_networks=max_num_of_networks
     )
     deployed_contracts = {
         contract_name: info['address']

@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 
+from glob import glob
+from os.path import basename, splitext
+
 from setuptools import find_packages, setup
 
 with open('README.md', encoding='utf-8') as readme_file:
@@ -18,7 +21,9 @@ setup(
     author='Konstantinos Paparas',
     author_email='kelsos@kelsos.net',
     url='https://github.com/kelsos/test-environment-scripts.',
-    packages=find_packages(),
+    packages=find_packages('src'),
+    package_dir={'': 'src'},
+    py_modules=[splitext(basename(path))[0] for path in glob('src/*.py')],
     include_package_data=True,
     license='MIT',
     zip_safe=False,

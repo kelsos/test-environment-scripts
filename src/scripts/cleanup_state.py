@@ -13,10 +13,11 @@ import click
 
 @click.command()
 @click.option("--chain-id", required=True, type=int)
-@click.option("--archive-directory",
-              required=True,
-              type=click.Path(exists=True, dir_okay=True, file_okay=False),
-              )
+@click.option(
+    "--archive-directory",
+    required=True,
+    type=click.Path(exists=True, dir_okay=True, file_okay=False),
+)
 @click.option("--delete", type=bool, default=False)
 def main(chain_id: int, archive_directory: str, delete: bool):
     accounts = get_accounts()

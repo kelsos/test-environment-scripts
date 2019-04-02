@@ -3,6 +3,7 @@ import time
 
 import click
 import requests
+
 from raiden_api.api import Api
 from raiden_api.model.requests import PaymentRequest
 
@@ -27,9 +28,7 @@ def main(token: str, start_port: int, end_port: int):
             try:
                 payment_request = PaymentRequest(amount=1, identifier=int(time.time()))
                 payment_response = api.payment(
-                    receiver=partner_address,
-                    request=payment_request,
-                    token=token,
+                    receiver=partner_address, request=payment_request, token=token
                 )
                 print(f'{our_address} to {partner_address} [v] -- ({payment_response.identifier})')
             except requests.exceptions.RequestException:

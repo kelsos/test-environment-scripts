@@ -3,16 +3,16 @@ import typing
 
 class Channel:
     def __init__(
-            self,
-            token_network_identifier: str,
-            channel_identifier: int,
-            partner_address: str,
-            token_address: str,
-            balance: int,
-            total_deposit: int,
-            state: str,
-            settle_timeout: int,
-            reveal_timeout: int,
+        self,
+        token_network_identifier: str,
+        channel_identifier: int,
+        partner_address: str,
+        token_address: str,
+        balance: int,
+        total_deposit: int,
+        state: str,
+        settle_timeout: int,
+        reveal_timeout: int,
     ):
         self.token_network_identifier = token_network_identifier
         self.channel_identifier = channel_identifier

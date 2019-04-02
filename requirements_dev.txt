@@ -1,11 +1,17 @@
 -r requirements.txt
 
-pytest
-mypy==0.641
 bump2version==0.5.8
 pylint
-flake8
-flake8-commas
-flake8-bugbear
-flake8-tuple
-isort
+
+flake8>=3.6.0
+flake8-bugbear==18.8.0
+flake8-tuple==0.2.13
+isort==4.3.16
+mypy==0.670
+black==19.3b0
+
+pytest==4.3.0
+pytest-runner
+pytest-cov
+pytest-structlog==0.1
+coverage>=4.5.2

@@ -18,7 +18,6 @@ class ServiceExit(Exception):
 
 
 class MineJob(threading.Thread):
-
     def __init__(self, web3: Web3, sender: str, receiver: str, block_time: int):
         threading.Thread.__init__(self)
         self.terminate = threading.Event()

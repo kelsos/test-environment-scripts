@@ -5,19 +5,14 @@ from typing import List
 
 import click
 import yaml
+
 from raiden_api.api import Api
 from raiden_api.model.exceptions import HttpErrorException
-from raiden_api.model.requests import OpenChannelRequest, ManageChannelRequest
+from raiden_api.model.requests import ManageChannelRequest, OpenChannelRequest
 
 
 class NodeConfig:
-    def __init__(
-            self,
-            address: str,
-            port: int,
-            funds: int,
-            targets: List[str] = None,
-    ):
+    def __init__(self, address: str, port: int, funds: int, targets: List[str] = None):
         self.address = address
         self.port = port
         self.funds = funds
@@ -60,9 +55,7 @@ class OpenJob(threading.Thread):
 
             try:
                 request = OpenChannelRequest(
-                    partner_address,
-                    self.__token_address,
-                    self.__node.funds,
+                    partner_address, self.__token_address, self.__node.funds
                 )
                 response = self.__api.open_channel(request)
                 print(f'Successfully opened channel from {address} to {response.partner_address}')

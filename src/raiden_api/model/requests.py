@@ -11,21 +11,18 @@ class PaymentRequest:
             self.identifier = int(time.time())
 
     def to_dict(self) -> typing.Dict[str, typing.Any]:
-        result = {
-            'amount': self.amount,
-            'identifier': self.identifier,
-        }
+        result = {'amount': self.amount, 'identifier': self.identifier}
 
         return result
 
 
 class OpenChannelRequest:
     def __init__(
-            self,
-            partner_address: str,
-            token_address: str,
-            total_deposit: int,
-            settle_timeout: int = 500,
+        self,
+        partner_address: str,
+        token_address: str,
+        total_deposit: int,
+        settle_timeout: int = 500,
     ):
         self.partner_address = partner_address
         self.token_address = token_address
