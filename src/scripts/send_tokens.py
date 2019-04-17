@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 import json
+import os
 import sys
+from json import JSONDecodeError
 
 import click
 from eth_account.account import Account
@@ -9,9 +11,10 @@ from web3 import Web3
 from web3.providers import HTTPProvider
 
 WEI_TO_ETH = 10 ** 18
-ERC20_ABI = json.loads(
-    '[{"constant":true,"inputs":[],"name":"name","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_spender","type":"address"},{"name":"_value","type":"uint256"}],"name":"approve","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"totalSupply","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_from","type":"address"},{"name":"_to","type":"address"},{"name":"_value","type":"uint256"}],"name":"transferFrom","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"decimals","outputs":[{"name":"","type":"uint8"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"_owner","type":"address"}],"name":"balanceOf","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"symbol","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_to","type":"address"},{"name":"_value","type":"uint256"}],"name":"transfer","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"_owner","type":"address"},{"name":"_spender","type":"address"}],"name":"allowance","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"anonymous":false,"inputs":[{"indexed":true,"name":"_from","type":"address"},{"indexed":true,"name":"_to","type":"address"},{"indexed":false,"name":"_value","type":"uint256"}],"name":"Transfer","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"_owner","type":"address"},{"indexed":true,"name":"_spender","type":"address"},{"indexed":false,"name":"_value","type":"uint256"}],"name":"Approval","type":"event"}]'
-)  # noqa: 501
+
+
+class AbiLoadError(RuntimeError):
+    """Failure in loading erc20_abi.json."""
 
 
 @click.command()
@@ -28,6 +31,8 @@ def main(
 
     web3 = Web3(HTTPProvider(rpc_url))
 
+    abi = load_erc20_abi()
+
     with open(keystore_file, 'r') as keystore:
         encrypted_key = keystore.read()
         private_key = web3.eth.account.decrypt(encrypted_key, password)
@@ -37,7 +42,7 @@ def main(
     print(f'Using account {checksum_address} to fund {len(testing_accounts)} accounts')
 
     sender = checksum_address
-    erc20 = web3.eth.contract(address=token, abi=ERC20_ABI)
+    erc20 = web3.eth.contract(address=token, abi=abi)
 
     wei_amount = int(amount * WEI_TO_ETH)
 
@@ -88,6 +93,16 @@ def unlock_account(web3: Web3, address: str, passphrase: str):
     if not web3.personal.unlockAccount(address, passphrase):
         print('Failed to unlock prefunded')
         sys.exit(1)
+
+
+def load_erc20_abi():
+    try:
+        dirname = os.path.dirname(__file__)
+        filename = os.path.join(dirname, '/abi/erc20_abi.json')
+        with filename.open() as abi_file:
+            return json.load(abi_file)
+    except (JSONDecodeError, UnicodeDecodeError) as ex:
+        raise AbiLoadError(f"Can't load erc20 contract abi contracts: {ex}") from ex
 
 
 if __name__ == "__main__":

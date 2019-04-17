@@ -8,6 +8,7 @@ lint: mypy
 	black --check $(BLACK_PARAMS) $(CODE_DIRS)
 	flake8 $(CODE_DIRS)
 	isort $(ISORT_PARAMS) --diff --check-only
+	pylint --rcfile .pylint.rc $(CODE_DIRS)
 
 mypy:
 	mypy $(CODE_DIRS)
