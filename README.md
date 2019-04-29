@@ -47,7 +47,7 @@ Then as soon as you are in the virtual environment you can use `pip` to install 
 for the scripts:
 
 ```bash
-pip install -e .
+pip install -r requirements.txt -e .
 ```
 
 For the private chain setup to work you need to have parity installed since the setup uses a [Parity Dev Chain](https://wiki.parity.io/Private-development-chain).  `parity` command should be in the `PATH`.
