@@ -5,7 +5,7 @@ SCRIPT_NAME=`basename $0`
 
 SCRIPT_PATH=${SCRIPT_PATH%"/$SCRIPT_NAME"}
 
-while getopts n:e:a:l:b:p: option
+while getopts n:e:a:l:b:p:v: option
 do
 case "${option}"
 in
@@ -15,6 +15,7 @@ a) ACCOUNT="${OPTARG}";;
 l) LOCAL_TRANSPORT="${OPTARG}";;
 b) BINARY="${OPTARG}";;
 p) PRIVATE="${OPTARG}";;
+v) VENV="${OPTARG}";;
 esac
 done
 
@@ -47,6 +48,11 @@ fi
 if [[ ! "$ENVIROMENT" ]]
 then
     ENVIROMENT = 'development'
+fi
+
+if [[ ! "$VENV" ]]
+then
+    VENV = 'raiden'
 fi
 
 NO_SYNC=''
@@ -105,10 +111,10 @@ echo "Starting network $NETWORK on configuration $ENVIROMENT with account $ADDRE
 
 if [[ ! "$BINARY" ]]
 then
-    echo 'Activating virtual enviroment'
+    echo "Activating virtual enviroment - $VENV"
     export WORKON_HOME="$HOME/.virtualenvs"
     source `which virtualenvwrapper.sh`
-    workon raiden
+    workon "$VENV"
     BINARY=raiden
 else
     if [[ ! -f "$BINARY" ]]
